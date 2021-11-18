@@ -1,0 +1,21 @@
+<template>
+    <lightning-card title="Inline Edit With Lightning Datatable in LWC">
+        <div class = "slds-m-around_medium">
+            <lightning-input type = "search" onchange = {handleKeyChange} class = "slds-m-bottom_small" label = "Search" >
+            </lightning-input>
+        <template if:true={accounts.data}>
+            <lightning-datatable key-field="Id" 
+                                 data={accounts.data} 
+                                 columns={columns} 
+                                 onsave={handleSave}
+                                 sorted-by={sortBy}
+                                 sorted-direction={sortDirection}
+                                 onsort={handleSortAccountData}
+                                 draft-values={saveDraftValues} 
+                                 hide-checkbox-column 
+                                 show-row-number-column>
+            </lightning-datatable>
+        </template>
+        </div>
+    </lightning-card>
+</template>
