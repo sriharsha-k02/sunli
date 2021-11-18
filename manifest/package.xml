@@ -8,5 +8,9 @@
         <members>*</members>
         <name>LightningComponentBundle</name>
     </types>
-    <version>52.0</version>
+    <types>
+      <members>*</members>
+      <name>CustomLabels</name>
+    </types>
+    <version>53.0</version>
 </Package>
