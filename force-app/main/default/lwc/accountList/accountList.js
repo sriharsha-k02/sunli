@@ -12,9 +12,9 @@ const columns = [
         sortable: true
     }, {
         label: 'Owner',
-        fieldName: 'OwnerId',
+        fieldName: 'OwnerName',
         type: 'text',
-        editable: true,
+        sortable: true,
     }, {
         label: 'Phone',
         fieldName: 'Phone',
@@ -35,28 +35,33 @@ const columns = [
 
 export default class AccountList extends LightningElement {
     columns = columns;
-    @track accounts;
+    accounts;
     saveDraftValues = [];
     searchKey = '';
-    @track sortBy;
-    @track sortDirection;
+    sortBy;
+    sortDirection;
     @wire(getAccounts,{ searchKey: '$searchKey' })
     cons(result) {
-        this.accounts = result;
-       
-        if (result.error) {
-            this.accounts = undefined;
+        if (result.data) {
+            this.accounts = result.data.map(row=>{
+                return{...row, OwnerName: row.Owner.Name}
+            })
+            this.error = undefined;
+   
+        } else if (result.error) {
+            this.error = result.error;
+            this.data = undefined;
         }
+   
     };
     handleKeyChange(event) {
-        // Debouncing this method: Do not update the reactive property as long as this function is
-        // being called within a delay of DELAY. This is to avoid a very large number of Apex method calls.
         window.clearTimeout(this.delayTimeout);
         const searchKey = event.target.value;
         this.delayTimeout = setTimeout(() => {
             this.searchKey = searchKey;
         }, 300);
     }
+
     handleSave(event) {
         this.saveDraftValues = event.detail.draftValues;
         const recordInputs = this.saveDraftValues.slice().map(draft => {
@@ -64,7 +69,7 @@ export default class AccountList extends LightningElement {
             return { fields };
         });
 
-        // Updateing the records using the UiRecordAPi
+        // Update record using the UiRecordAPi
         const promises = recordInputs.map(recordInput => updateRecord(recordInput));
         Promise.all(promises).then(res => {
             this.dispatchEvent(
@@ -95,18 +100,13 @@ export default class AccountList extends LightningElement {
         this.sortAccountData(event.detail.fieldName, event.detail.sortDirection);
     }
 
-
-    sortAccountData(fieldname, direction) {
-        
-        let parseData = JSON.parse(JSON.stringify(this.accounts));
-       
+    sortAccountData(fieldname, direction) {      
+        let parseData = JSON.parse(JSON.stringify(this.accounts));       
         let keyValue = (a) => {
             return a[fieldname];
         };
 
-
        let isReverse = direction === 'asc' ? 1: -1;
-
 
            parseData.sort((x, y) => {
             x = keyValue(x) ? keyValue(x) : ''; 
@@ -116,13 +116,11 @@ export default class AccountList extends LightningElement {
         });
         
         this.accounts = parseData;
-
-
     }
 
 
-    // This function is used to refresh the table once data updated
-    async refresh() {
-        await refreshApex(this.contacts);
+    // Refresh the table after data is updated
+    refresh() {
+        refreshApex(this.accounts);
     }
 }
