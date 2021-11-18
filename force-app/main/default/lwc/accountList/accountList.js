@@ -5,12 +5,8 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
 // datatable columns
 const columns = [
-    {
-        label: 'Name',
-        fieldName: 'Name',
-        type: 'text',
-        sortable: true
-    }, {
+    { label: 'Account Name', fieldName: 'accountIdForURL', sortable: true, type: 'url', typeAttributes: { label: { fieldName: 'Name' }, target: '_blank' } }
+    , {
         label: 'Owner',
         fieldName: 'OwnerName',
         type: 'text',
@@ -43,10 +39,21 @@ export default class AccountList extends LightningElement {
     @wire(getAccounts,{ searchKey: '$searchKey' })
     cons(result) {
         if (result.data) {
-            this.accounts = result.data.map(row=>{
-                return{...row, OwnerName: row.Owner.Name}
-            })
-            this.error = undefined;
+            let accountArray = [];
+            //add each row data in array using for loop
+            result.data.forEach(acc => {
+                let accountRow = {};
+                accountRow.Name = acc.Name;
+                accountRow.accountIdForURL = '/' + acc.Id;
+                accountRow.OwnerName =acc.Owner.Name;
+                accountRow.Phone = acc.Phone;
+                accountRow.Website = acc.Website;
+                accountRow.AnnualRevenue = acc.AnnualRevenue;
+                 
+                accountArray.push(accountRow);
+            });
+            this.accounts = accountArray;
+
    
         } else if (result.error) {
             this.error = result.error;
