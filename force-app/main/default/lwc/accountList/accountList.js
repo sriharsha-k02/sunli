@@ -128,7 +128,7 @@ export default class AccountList extends LightningElement {
 
 
     // Refresh the table after data is updated
-    refresh() {
-        refreshApex(this.accounts);
+    async refresh() {
+        await refreshApex(this.accounts);
     }
 }
