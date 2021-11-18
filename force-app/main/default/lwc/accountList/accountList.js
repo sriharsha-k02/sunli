@@ -44,6 +44,7 @@ export default class AccountList extends LightningElement {
             result.data.forEach(acc => {
                 let accountRow = {};
                 accountRow.Name = acc.Name;
+                accountRow.Id = acc.Id;
                 accountRow.accountIdForURL = '/' + acc.Id;
                 accountRow.OwnerName =acc.Owner.Name;
                 accountRow.Phone = acc.Phone;
